@@ -150,7 +150,7 @@ def webhook():
         return jsonify({'Message': 'No repository information found in the payload'}), 400
     
     repo_name = payload['repository']['name']
-    CLONE_URL = payload['repository']['clone_url']
+    # CLONE_URL = payload['repository']['clone_url']
         
     # Try to change to repo directory
     try:
@@ -158,9 +158,9 @@ def webhook():
     except FileNotFoundError:
         return jsonify({'Message': f'The repo directory {REPO_PATH} does not exist'}), 404
 
-    # Perform git pull
+    # Perform git pull. Might need to add , CLONE_URL back into subprocess 1
     try:
-        subprocess.run(['git', 'pull', CLONE_URL], check=True)
+        subprocess.run(['git', 'pull'], check=True)
         subprocess.run(['touch', SERVER_PATH], check=True) # Reload PythonAnywhere WebServer
         return jsonify({'Message': f'Successfully pulled updates from the repository {repo_name}'}), 200
     
