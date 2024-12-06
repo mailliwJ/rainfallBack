@@ -6,7 +6,7 @@ import pickle as pkl
 import pandas as pd
 import subprocess
 import os
-import application.backend.utils as utils
+import utils as utils
 
 from flask import Flask, jsonify, request
 from sklearn.model_selection import train_test_split
@@ -82,13 +82,13 @@ def retrain():
         
         if request.method == 'POST':
             try:
-                current_evaluation_results = utils.load_evaluation_results()
-                updated_evaluation_results = utils.test_evaluation(model, X_train, y_train, X_test, y_test)
+                current_metrics = utils.load_evaluation_results()
+                new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)
 
                 return jsonify({
                     'Message': 'Evaluation Complete. Metrics comparison ready',
-                    'Current Evaluation Metrics': current_evaluation_results,
-                    'Updated Dataset Evaluation Metrics': updated_evaluation_results
+                    'Current Evaluation Metrics': current_metrics,
+                    'New Evaluation Metrics': new_metrics
                 }), 200
         
             except Exception as e:
