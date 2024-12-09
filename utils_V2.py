@@ -1,6 +1,5 @@
 import json
 import numpy as np
-import os
 import pickle as pkl
 
 from sklearn.metrics import mean_squared_error, root_mean_squared_error, mean_absolute_percentage_error
@@ -8,31 +7,43 @@ from sklearn.model_selection import cross_validate, GridSearchCV
 from sklearn.pipeline import Pipeline
 
 from time import time
-
-from zipfile import ZipFile
-
 # =====================================================================================================================================================================
 # Handle Data
 
 def process_data(header, data_rows):
-    pressure_idx = header.index('pressure')
-    cleaned_data = []
+
+    # Get precipitation original index in header
+    precip_col_idx = header.index('precipitation')
+
+    # Get the column indices for the desired features in the dataset
+    feature_idxs = [i for i, feat_name in enumerate(header) if feat_name not in ['date', 'snow_depth']]
+    precip_idx = feature_idxs.index(precip_col_idx)
+
+    # Define missings/nan value markers
     missings = [None, '', 'NaN', 'nan', 'N/A', 'n/a', 'NULL', 'null']
 
+    all_values = []
+
     for row in data_rows:
-        if any(val in missings for val in row):
+        values = [row[i] for i in feature_idxs]
+        if any(val in missings for val in values):
             continue
+        values = [float(val) for val in values]
+        all_values.append(values)
 
-        try:
-            pressure_values = float(row[pressure_idx]) / 1000
-        except ValueError:
-            continue
+    X = []
+    y = []
+    
+    for row in all_values:
+        feature_vals = [val for i, val in enumerate(row) if i != precip_idx]
+        target_val = row[precip_idx]
+        X.append(feature_vals)
+        y.append(target_val)
 
-        row[pressure_idx] = pressure_values
+    X = np.array(X)
+    y = np.array(y)
 
-        cleaned_data.append(row)
-
-    return cleaned_data
+    return X, y
 
 # =====================================================================================================================================================================
 # Cross-Validate

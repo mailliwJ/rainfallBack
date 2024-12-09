@@ -11,92 +11,108 @@ import utils_V2 as utils
 from flask import Flask, jsonify, request
 from sklearn.model_selection import train_test_split
 
-
 # ================================================================================================================================================================================================================================================================
 
 app = Flask(__name__)
 
+# Load trained model and scaler that was fitted and used to transform training data
 model = pkl.load(open('./models/best_model.pkl', 'rb'))
 scaler = pkl.load(open('./transformers/scaler.pkl', 'rb'))
 
 # ================================================================================================================================================================================================================================================================
 
+# Basic hoe route just to return a welcome message for now
 @app.route('/')
 def home():
     return 'Welcome to my rain prediction app'
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# Endpoint takes in climatic parameters via a JSON POST request and returns a rainfall prediction in mm
+
 @app.route('/predict', methods=['POST'])
 def predict():
+
+    # Parse JSON data from request
     data = request.get_json()
 
+    # Define required parameters for the prediction
     required_params = ['cloud_cover', 'sunshine', 'global_radiation', 'max_temp', 'mean_temp', 'min_temp', 'pressure']
+    
+    # Check all required parameters are in the incoming JSON
     if not all(param in data for param in required_params):
         return jsonify({'Error': 'Missing required parameter. Must provide a value for all parameters'})
     
     try:
+        # Convert input paramters to floats
         cloud_cover = float(data['cloud_cover'])
         sunshine = float(data['sunshine'])
         global_radiation = float(data['global_radiation'])
         max_temp = float(data['max_temp'])
         mean_temp = float(data['mean_temp'])
         min_temp = float(data['min_temp'])
-        pressure = float(data['pressure'])
+        pressure = float(data['pressure']*1000)
 
+        # Make a single input data array for the model to work with
         input_data = np.array([[cloud_cover, sunshine, global_radiation, max_temp, mean_temp, min_temp, pressure]])
+        
+        # Scale the input data using the scaler that was fitted when training the model
         scaled_input = scaler.transform(input_data)
 
+        # Make a prediction using the trained model. As .predict() returns an array, need to add [0] to access the prediction
         prediction = model.predict(scaled_input)[0]
-
+        
+        # Return the prediction in a JSON. This is the JSON that is returned back to the frontend
         return jsonify({'Prediction': prediction})
     
+    # If an error occurs somewhere in this process returns a 500 error with the specific error
     except Exception as e:
         return jsonify({'Error': str(e)}), 500
     
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+# This endpoint handles retraining a model with new data and the saving of new models and updated data.
+# - POST: Evaluates the model, retrained on updated data and returns the evaluation metrics
+# - PUT: Saves the updated data and retrained model
+
 @app.route('/retrain_save', methods=['POST', 'PUT'])
 def retrain():
     try:
+        # Checks if the request actually contains a file (aiming to send a csv file)
         if 'file' not in request.files:
             return jsonify({'Error': 'No file uploaded'}), 400
         else:
             file = request.files['file']
         
         try:
+            # Read the new CSV file
             with file.stream as f:
                 reader = csv.reader(f)
-                new_header = next(reader)
-                new_data = [row for row in reader]
+                new_header = next(reader)   # Extract the header
+                new_data = [row for row in reader]  # Extract the data
+                print('New data read successfully')
 
+            # Read the original and saved CSV file
             with open('./data/original_data.csv', 'r', newline='', encoding='utf-8') as f:
                 reader = csv.reader(f)
-                original_header = next(reader)
-                original_data = [row for row in reader]
+                original_header = next(reader)  # Extract the header
+                original_data = [row for row in reader] # Extract the data
+                print('Original data read successfully')
 
+
+            # Check that the headers match to ensure data can be merged
             if new_header != original_header:
                 return jsonify({'Error': 'The new dataset is missing or has extra columns'}), 400
             
+            # Merge original and new data
             updated_data = original_data + new_data
-            updated_clean = utils.process_data(original_header, updated_data)
+            print('Data merged successfully')
 
-            feature_idxs = [i for i, col in enumerate(original_header) if col not in ['date','precipitation','snow_depth']]
-            date_idx = original_header.index('date')
-            precip_idx = original_header.index('precipitation')
-
-            X = []
-            y = []
-            for row in updated_clean:
-                feature_values = [float(row[i]) for i in feature_idxs]
-                target_values = float(row[precip_idx])
-                X.append(feature_values)
-                y.append(target_values)
-
-            X = np.array(X)
-            y = np.array(y)
+            # Process the data using utils function process_data
+            X, y = utils.process_data(original_header, updated_data)
 
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=13)
+            print('Merged data split successfully')
 
         except Exception as e:
             return jsonify({'Error': f'Error during preprocessing: {str(e)}'}), 500
@@ -164,7 +180,6 @@ def webhook():
     except FileNotFoundError:
         return jsonify({'Message': f'The repo directory {REPO_PATH} does not exist'}), 404
 
-    # Perform git pull. Might need to add , CLONE_URL back into subprocess 1
     try:
         subprocess.run(['git', 'pull', CLONE_URL], check=True)
         subprocess.run(['touch', SERVER_PATH], check=True) # Reload PythonAnywhere WebServer
