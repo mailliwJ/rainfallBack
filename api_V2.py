@@ -31,7 +31,7 @@ def home():
 def predict():
     data = request.get_json()
 
-    required_params = ['cloud_cover', 'sunshine', 'global_radiation', 'max_temp', 'mean_temp', 'min_temp', 'pressure', 'snow_depth']
+    required_params = ['cloud_cover', 'sunshine', 'global_radiation', 'max_temp', 'mean_temp', 'min_temp', 'pressure']
     if not all(param in data for param in required_params):
         return jsonify({'Error': 'Missing required parameter. Must provide a value for all parameters'})
     
