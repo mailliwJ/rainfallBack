@@ -21,7 +21,7 @@ scaler = pkl.load(open('./transformers/scaler.pkl', 'rb'))
 
 # ================================================================================================================================================================================================================================================================
 
-# Basic hoe route just to return a welcome message for now
+# Basic home route just to return a welcome message for now
 @app.route('/')
 def home():
     return 'Welcome to my rain prediction app'
@@ -65,7 +65,7 @@ def predict():
         # Return the prediction in a JSON. This is the JSON that is returned back to the frontend
         return jsonify({'Prediction': prediction})
     
-    # If an error occurs somewhere in this process returns a 500 error with the specific error
+    # If an error occurs somewhere in this process returns a 500 error with the specific exception
     except Exception as e:
         return jsonify({'Error': str(e)}), 500
     
@@ -99,7 +99,6 @@ def retrain():
                 original_data = [row for row in reader] # Extract the data
                 print('Original data read successfully')
 
-
             # Check that the headers match to ensure data can be merged
             if new_header != original_header:
                 return jsonify({'Error': 'The new dataset is missing or has extra columns'}), 400
@@ -111,17 +110,21 @@ def retrain():
             # Process the data using utils function process_data
             X, y = utils.process_data(original_header, updated_data)
 
+            # Split data into X, y pairs for train and test sets
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=13)
             print('Merged data split successfully')
 
+        # If an error occurs somewhere in this process returns a 500 error with the specific exception
         except Exception as e:
             return jsonify({'Error': f'Error during preprocessing: {str(e)}'}), 500
         
+        # If the request is POST evaluate current metrics with the metrics from the updated dataset
         if request.method == 'POST':
             try:
-                current_metrics = utils.load_evaluation_results()
-                new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)
+                current_metrics = utils.load_evaluation_results()   # Loads current metrics
+                new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)    # Calculates updated dataset evaluation metrics
 
+                # Returns both sets of metrics to frontend for user evaluation and decision
                 return jsonify({
                     'Message': 'Evaluation Complete. Metrics comparison ready',
                     'Current Evaluation Metrics': current_metrics,
@@ -130,16 +133,20 @@ def retrain():
         
             except Exception as e:
                 return jsonify({'Error': f'Error during evaluation: {str(e)}'}), 500
-            
+        
+        # If the request is PUT the model is fit to the new dataset again and both are saved permanently
         elif request.method == 'PUT':
             try:
+                # Retrain the model on new combined dataset
                 model.fit(X_train, y_train)
 
+                # Save new dataset
                 with open('./data/updated_data.csv', 'w', newline='', encoding='utf-8') as f:
                     writer = csv.writer(f)
                     writer.writerow(original_header)
                     writer.writerows(updated_data)
 
+                # Save the retrained model
                 pkl.dump(model, open('./models/updated_model.pkl', 'wb'))
 
                 return jsonify({'Message': 'Updated dataset and model saved successfully'}), 200
@@ -147,9 +154,9 @@ def retrain():
             except Exception as e:
                 return jsonify({'Error': f'Error during Saving: {str(e)}'}), 500    
     
+    # Idea to put the logic for this whole block in a try except was to be able to catch any other issues i hadnt thought of
     except Exception as e:
         return jsonify({'Error': str(e)}), 500
-    
     
 # ================================================================================================================================================================================================================================================================
 
@@ -171,7 +178,8 @@ def webhook():
     if 'repository' not in payload:
         return jsonify({'Message': 'No repository information found in the payload'}), 400
     
-    repo_name = payload['repository']['name']
+
+    REPO_NAME = payload['repository']['name']
     CLONE_URL = payload['repository']['clone_url']
         
     # Try to change to repo directory
@@ -181,14 +189,15 @@ def webhook():
         return jsonify({'Message': f'The repo directory {REPO_PATH} does not exist'}), 404
 
     try:
-        subprocess.run(['git', 'pull', CLONE_URL], check=True)
-        subprocess.run(['touch', SERVER_PATH], check=True) # Reload PythonAnywhere WebServer
-        return jsonify({'Message': f'Successfully pulled updates from the repository {repo_name}'}), 200
+        subprocess.run(['git', 'pull', CLONE_URL], check=True)  # Run git pull
+        subprocess.run(['touch', SERVER_PATH], check=True)  # Reload PythonAnywhere WebServer
+        return jsonify({'Message': f'Successfully pulled updates from the repository {REPO_NAME}'}), 200
     
     except subprocess.CalledProcessError as e:
         return jsonify({'Message': f'Error during git pull: {str(e)}'}), 500
 
 # ===================================================================================================================================================================
 
+# Some PythonAnywhere troubleshooting says not to include the app.run() call
 if __name__ == '__main__':
     app.run(debug=True)

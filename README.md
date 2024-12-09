@@ -1,5 +1,5 @@
 # Rainfall Application
-This project is a full-stack web application for predicting rainfall using climatic data. It consists of:
+This project is a web application for predicting rainfall using climatic data. It consists of:
 - Backend: A Flask API for making rainfall predictions, retraining the model, and saving updated data.
 - Frontend: A Streamlit app for user interaction, including uploading data, retraining the model, and viewing evaluation metrics.
 
@@ -58,3 +58,5 @@ An example dataset for retraining:
 |20240101|6          |5.2     |120             |25.3    |22.1     |18.4    |1013    |0         |12.3         |
 |20240102|8          |4.5     |110             |24.1    |21.0     |17.8    |1010    |0         |10.7         |
 
+## Further Development
+I want to investigate using the library plotly to create interactive forcasting graphics of each climatic parameter, which will include time series modeling.
