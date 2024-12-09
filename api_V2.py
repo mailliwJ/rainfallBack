@@ -6,7 +6,7 @@ import numpy as np
 import pickle as pkl
 import subprocess
 import os
-import utils as utils
+import utils_V2 as utils
 
 from flask import Flask, jsonify, request
 from sklearn.model_selection import train_test_split
