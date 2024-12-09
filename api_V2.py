@@ -43,10 +43,8 @@ def predict():
         mean_temp = float(data['mean_temp'])
         min_temp = float(data['min_temp'])
         pressure = float(data['pressure'])
-        snow_depth = float(data['snow_depth'])
 
-
-        input_data = np.array([[cloud_cover, sunshine, global_radiation, max_temp, mean_temp, min_temp, pressure, snow_depth]])
+        input_data = np.array([[cloud_cover, sunshine, global_radiation, max_temp, mean_temp, min_temp, pressure]])
         scaled_input = scaler.transform(input_data)
 
         prediction = model.predict(scaled_input)[0]
@@ -83,7 +81,7 @@ def retrain():
             updated_data = original_data + new_data
             updated_clean = utils.process_data(original_header, updated_data)
 
-            feature_idxs = [i for i, col in enumerate(original_header) if col not in ['date','precipitation']]
+            feature_idxs = [i for i, col in enumerate(original_header) if col not in ['date','precipitation','snow_depth']]
             date_idx = original_header.index('date')
             precip_idx = original_header.index('precipitation')
 
