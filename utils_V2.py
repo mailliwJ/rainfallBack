@@ -116,9 +116,9 @@ def tune_hyperparameters(pipelines: dict, param_grids: dict, X_train, y_train, c
             print(time_message)
 
             if 'neg_' in cv_scoring:
-                print(f'Best Score: {-np.mean(cv['test_score']):.5f}')
+                print(f"Best Score: {-np.mean(cv['test_score']):.5f}")
             else:
-                print(f'Best Score: {np.mean(cv['test_score']):.5f}')
+                print(f"Best Score: {np.mean(cv['test_score']):.5f}")
             print()
         
         tuned_models[name] = best
