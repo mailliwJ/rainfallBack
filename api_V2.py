@@ -142,7 +142,7 @@ def retrain():
 # WebHook
 
 # Path to repositorio and WSGI configuration
-REPO_PATH = '/home/mailliwj/rainfall'
+REPO_PATH = '/home/mailliwj/rainfallBack'
 SERVER_PATH = '/var/www/mailliwj_pythonanywhere_com_wsgi.py' 
 
 @app.route('/webhook', methods=['POST'])
