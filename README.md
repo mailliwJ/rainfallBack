@@ -53,10 +53,10 @@ Version Control: GitHub
 ## Example CSV File
 An example dataset for retraining:
 
-|date    |cloud_cover|sunshine|global_radiation|max_temp|mean_temp|min_temp|pressure|snow_depth|precipitation|
-|--------|-----------|--------|----------------|--------|---------|--------|--------|----------|-------------|
-|20240101|6          |5.2     |120             |25.3    |22.1     |18.4    |1013    |0         |12.3         |
-|20240102|8          |4.5     |110             |24.1    |21.0     |17.8    |1010    |0         |10.7         |
+|date    |cloud_cover|sunshine|global_radiation|max_temp|mean_temp|min_temp|precipitation|pressure|snow_depth|
+|--------|-----------|--------|----------------|--------|---------|--------|-------------|--------|----------|
+|19790101|2.0        |7.0     |52.0            |2.3     |-4.1     |-7.5    |0.4          |101900  |9.0       |
+|19790102|6.0        |1.7     |27.0            |1.6     |-2.6     |-7.5    |0.0          |102530  |8.0       |
 
 ## Further Development
 I want to investigate using the library plotly to create interactive forcasting graphics of each climatic parameter, which will include time series modeling.

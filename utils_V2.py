@@ -293,7 +293,7 @@ def save_evaluation_results(results):
     """
     Saves evaluation results (a dictionary) to a JSON file.
     """
-    with open(f'./data/evaluation_results.json', 'w') as file:
+    with open('./data/evaluation_results.json', 'w') as file:
         json.dump(results, file, indent=4)
 
 # =====================================================================================================================================================================
