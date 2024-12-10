@@ -132,11 +132,12 @@ def retrain():
         action = request.args.get('action', 'evaluate')
 
         # If the request is POST evaluate current metrics with the metrics from the updated dataset
+
+        current_metrics = utils.load_evaluation_results()   # Loads current metrics
+        new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)   # Calculates updated dataset evaluation metrics
+        
         if action == 'evaluate':
             try:
-                current_metrics = utils.load_evaluation_results()   # Loads current metrics
-                new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)    # Calculates updated dataset evaluation metrics
-
                 # Returns both sets of metrics to frontend for user evaluation and decision
                 return jsonify({
                     'Message': 'Evaluation Complete. Metrics comparison ready',
@@ -161,7 +162,9 @@ def retrain():
                     writer.writerows(updated_data)  # Saving uncleaned but updated
 
                 # Save the retrained model
-                pkl.dump(updated_model, open('./models/updated_model.pkl', 'wb'))                
+                pkl.dump(updated_model, open('./models/updated_model.pkl', 'wb'))
+
+                utils.save_evaluation_results(new_metrics) 
 
                 return jsonify({'Message': 'Updated dataset and model saved successfully'}), 200
 

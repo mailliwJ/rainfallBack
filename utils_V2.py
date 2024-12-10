@@ -247,7 +247,7 @@ def test_evaluation(tuned_models: dict, X_train=None, y_train=None, X_test=None,
 # =====================================================================================================================================================================
 # Save best model
 
-def save_best_model(evaluation_results: dict, tuned_models: dict, selection_metric='', save_path='./models/best_model.pkl'):
+def save_best_model(evaluation_results: dict, tuned_models: dict, selection_metric='', model_name='original_model'):
     """
     Selects the best model based on a specified metric and saves it
     
@@ -268,7 +268,7 @@ def save_best_model(evaluation_results: dict, tuned_models: dict, selection_metr
         best_model = tuned_models[best_model_name]
 
     # Sves the best model
-    pkl.dump(best_model, open(save_path, 'wb'))
+    pkl.dump(best_model, open(f'./models/{model_name}.pkl', 'wb'))
 
     return best_model
 
@@ -293,7 +293,7 @@ def save_evaluation_results(results):
     """
     Saves evaluation results (a dictionary) to a JSON file.
     """
-    with open('./data/evaluation_results.json', 'w') as file:
+    with open(f'./data/evaluation_results.json', 'w') as file:
         json.dump(results, file, indent=4)
 
 # =====================================================================================================================================================================
