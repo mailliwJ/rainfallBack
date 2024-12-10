@@ -86,12 +86,15 @@ def retrain():
             file = request.files['file']
         
         try:
-            """# Read the new CSV file
-            with file.stream as f:
-                reader = csv.reader(f)
-                new_header = next(reader)   # Extract the header
-                new_data = [row for row in reader]  # Extract the data
-                print('New data read successfully')"""
+            # Get CSV content using io.StringIO
+            file_content = file.read().decode('utf-8')
+            f = io.StringIO(file_content)
+
+            # Read the new CSV file
+            reader = csv.reader(f)
+            new_header = next(reader)   # Extract the header
+            new_data = [row for row in reader]  # Extract the data
+            print('New data read successfully')
 
             # Read the original and saved CSV file
             """with open('./data/new_data.csv', 'r', newline='', encoding='utf-8') as f:
@@ -99,14 +102,6 @@ def retrain():
                 new_header = next(reader)  # Extract the header
                 new_data = [row for row in reader] # Extract the data
                 print('Original data read successfully')"""
-            
-            file_content = file.read().decode('utf-8')
-            f = io.StringIO(file_content)
-
-            reader = csv.reader(f)
-            new_header = next(reader)   # Extract the header
-            new_data = [row for row in reader]  # Extract the data
-            print('New data read successfully')
 
             # Read the original and saved CSV file
             with open('./data/original_data.csv', 'r', newline='', encoding='utf-8') as f:
