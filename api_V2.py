@@ -2,6 +2,7 @@
 # Imports
 
 import csv
+import io
 import numpy as np
 import pickle as pkl
 import subprocess
@@ -85,12 +86,12 @@ def retrain():
             file = request.files['file']
         
         try:
-            # Read the new CSV file
+            """# Read the new CSV file
             with file.stream as f:
                 reader = csv.reader(f)
                 new_header = next(reader)   # Extract the header
                 new_data = [row for row in reader]  # Extract the data
-                print('New data read successfully')
+                print('New data read successfully')"""
 
             # Read the original and saved CSV file
             """with open('./data/new_data.csv', 'r', newline='', encoding='utf-8') as f:
@@ -98,6 +99,14 @@ def retrain():
                 new_header = next(reader)  # Extract the header
                 new_data = [row for row in reader] # Extract the data
                 print('Original data read successfully')"""
+            
+            file_content = file.read().decode('utf-8')
+            f = io.StringIO(file_content)
+
+            reader = csv.reader(f)
+            new_header = next(reader)   # Extract the header
+            new_data = [row for row in reader]  # Extract the data
+            print('New data read successfully')
 
             # Read the original and saved CSV file
             with open('./data/original_data.csv', 'r', newline='', encoding='utf-8') as f:
