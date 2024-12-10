@@ -76,7 +76,7 @@ def predict():
 # - POST: Evaluates the model, retrained on updated data and returns the evaluation metrics
 # - PUT: Saves the updated data and retrained model
 
-@app.route('/retrain_save', methods=['POST', 'PUT'])
+@app.route('/retrain_save', methods=['POST'])
 def retrain():
     try:
         # Checks if the request actually contains a file (aiming to send a csv file)
@@ -129,8 +129,10 @@ def retrain():
         except Exception as e:
             return jsonify({'Error': f'Error during preprocessing: {str(e)}'}), 500
         
+        action = request.args.get('action', 'evaluate')
+
         # If the request is POST evaluate current metrics with the metrics from the updated dataset
-        if request.method == 'POST':
+        if action == 'evaluate':
             try:
                 current_metrics = utils.load_evaluation_results()   # Loads current metrics
                 new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)    # Calculates updated dataset evaluation metrics
@@ -146,7 +148,7 @@ def retrain():
                 return jsonify({'Error': f'Error during evaluation: {str(e)}'}), 500
         
         # If the request is PUT the model is fit to the new dataset again and both are saved permanently
-        elif request.method == 'PUT':
+        elif action == 'save':
             try:
                 # Retrain the model on new combined dataset
                 updated_model = model
