@@ -76,9 +76,7 @@ def process_data(header, data_rows):
 # =====================================================================================================================================================================
 # Cross-Validate
 
-scaler = pkl.load(open('./transformers/scaler.pkl', 'rb'))
-
-def cross_validate_models(models: dict, X_train, y_train) -> dict:
+def cross_validate_models(models: dict, X_train, y_train, scaler) -> dict:
     """
     Performs cross_validation on a dictionary of algorithms {name: algorithm}
     Uses the scaler used in initial training of first model
