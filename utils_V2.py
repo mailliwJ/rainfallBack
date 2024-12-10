@@ -247,7 +247,7 @@ def test_evaluation(tuned_models: dict, X_train=None, y_train=None, X_test=None,
 # =====================================================================================================================================================================
 # Save best model
 
-def save_best_model(evaluation_results: dict, tuned_models: dict, selection_metric='', model_name='original_model'):
+def save_best_model(evaluation_results: dict, tuned_models: dict, selection_metric='', model_name='model'):
     """
     Selects the best model based on a specified metric and saves it
     
