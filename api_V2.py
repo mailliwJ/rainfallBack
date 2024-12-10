@@ -57,7 +57,7 @@ def predict():
         input_data = np.array([[cloud_cover, sunshine, global_radiation, max_temp, mean_temp, min_temp, pressure]])
         
         # Scale the input data using the scaler that was fitted when training the model
-        scaled_input = scaler.transform(input_data[0])
+        scaled_input = scaler.transform(input_data)
 
         # Make a prediction using the trained model. As .predict() returns an array, need to add [0] to access the prediction
         prediction = model.predict(scaled_input)[0]
