@@ -57,7 +57,7 @@ def predict():
         input_data = np.array([[cloud_cover, sunshine, global_radiation, max_temp, mean_temp, min_temp, pressure]])
         
         # Scale the input data using the scaler that was fitted when training the model
-        scaled_input = scaler.transform(input_data)
+        scaled_input = scaler.transform(input_data[0])
 
         # Make a prediction using the trained model. As .predict() returns an array, need to add [0] to access the prediction
         prediction = model.predict(scaled_input)[0]
@@ -86,11 +86,18 @@ def retrain():
         
         try:
             # Read the new CSV file
-            with file.stream as f:
+            """with file.stream as f:
                 reader = csv.reader(f)
                 new_header = next(reader)   # Extract the header
                 new_data = [row for row in reader]  # Extract the data
-                print('New data read successfully')
+                print('New data read successfully')"""
+
+            # Read the original and saved CSV file
+            with open('./data/new_data.csv', 'r', newline='', encoding='utf-8') as f:
+                reader = csv.reader(f)
+                new_header = next(reader)  # Extract the header
+                new_data = [row for row in reader] # Extract the data
+                print('Original data read successfully')
 
             # Read the original and saved CSV file
             with open('./data/original_data.csv', 'r', newline='', encoding='utf-8') as f:
@@ -138,16 +145,17 @@ def retrain():
         elif request.method == 'PUT':
             try:
                 # Retrain the model on new combined dataset
-                model.fit(X_train, y_train)
+                updated_model = model
+                updated_model.fit(X_train, y_train)
 
                 # Save new dataset
                 with open('./data/updated_data.csv', 'w', newline='', encoding='utf-8') as f:
                     writer = csv.writer(f)
                     writer.writerow(original_header)
-                    writer.writerows(updated_data)
+                    writer.writerows(updated_data)  # Saving uncleaned but updated
 
                 # Save the retrained model
-                pkl.dump(model, open('./models/updated_model.pkl', 'wb'))
+                pkl.dump(updated_model, open('./models/updated_model.pkl', 'wb'))                
 
                 return jsonify({'Message': 'Updated dataset and model saved successfully'}), 200
 

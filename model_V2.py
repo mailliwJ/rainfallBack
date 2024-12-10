@@ -73,3 +73,5 @@ evaluation_results = utils.test_evaluation(tuned_models, X_train, y_train, X_tes
 utils.save_best_model(evaluation_results, tuned_models, selection_metric='MSE')
 
 pkl.dump(scaler, open('./transformers/scaler.pkl', 'wb'))
+
+print('Model and transformers ready for use')
