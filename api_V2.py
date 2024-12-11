@@ -125,14 +125,13 @@ def retrain():
             
             # Merge original and new data
             updated_data = original_data + new_data
-            print('Data merged successfully')
 
             # Process the data using utils function process_data
             X, y = utils.process_data(original_header, updated_data)
 
             # Split data into X, y pairs for train and test sets
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=13)
-            print('Merged data split successfully')
+            print('Data ready for retraining.')
 
         # If an error occurs somewhere in this process returns a 500 error with the specific exception
         except Exception as e:
