@@ -82,7 +82,7 @@ def predict():
 # - action: 'evaluate': Evaluates the model, retrained on updated data and returns the evaluation metrics
 # - action: 'save': Saves the updated data and retrained model
 
-@app.route('/retrain_save', methods=['POST', 'GET'])
+@app.route('/retrain_save', methods=['POST'])
 def retrain():
     
     model = pkl.load(open('./models/model.pkl', 'rb'))
