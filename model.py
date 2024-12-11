@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 import pickle as pkl
-import utils_V2 as utils
+import utils as u
 
 from sklearn.linear_model import LinearRegression, Lasso, Ridge, ElasticNet
 from sklearn.ensemble import RandomForestRegressor
@@ -17,7 +17,7 @@ with open('./data/original_data.csv', 'r', newline='', encoding='utf-8') as f:
     original_data = [row for row in reader]
 
 
-X, y = utils.process_data(original_header, original_data)
+X, y = u.process_data(original_header, original_data)
 print('X Shape:', X.shape)
 print('y Shape:', y.shape)
 
@@ -33,7 +33,7 @@ algs_list = [
     ]
 
 scaler = StandardScaler()
-cv_results, my_pipelines = utils.cross_validate_models(algs_list, X_train, y_train, scaler)
+cv_results, my_pipelines = u.cross_validate_models(algs_list, X_train, y_train, scaler)
 
 gs_params = {
     'Ridge': {
@@ -66,13 +66,13 @@ gs_params = {
         }
     }
 
-tuned_models = utils.tune_hyperparameters(my_pipelines, gs_params, X_train, y_train, 'neg_mean_squared_error')
+tuned_models = u.tune_hyperparameters(my_pipelines, gs_params, X_train, y_train, 'neg_mean_squared_error')
 
-evaluation_results = utils.test_evaluation(tuned_models, X_train, y_train, X_test, y_test)
+evaluation_results = u.test_evaluation(tuned_models, X_train, y_train, X_test, y_test)
 
-best_model = utils.save_best_model(evaluation_results, tuned_models, selection_metric='MSE')
+best_model = u.save_best_model(evaluation_results, tuned_models, selection_metric='MSE')
 
-utils.save_evaluation_results(best_model, evaluation_results) 
+u.save_evaluation_results(best_model, evaluation_results) 
 
 pkl.dump(scaler, open('./transformers/scaler.pkl', 'wb'))
 

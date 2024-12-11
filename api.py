@@ -7,7 +7,7 @@ import numpy as np
 import pickle as pkl
 import subprocess
 import os
-import utils_V2 as utils
+import utils as u
 
 from flask import Flask, jsonify, redirect, request, url_for
 from sklearn.model_selection import train_test_split
@@ -127,7 +127,7 @@ def retrain():
             updated_data = original_data + new_data
 
             # Process the data using utils function process_data
-            X, y = utils.process_data(original_header, updated_data)
+            X, y = u.process_data(original_header, updated_data)
 
             # Split data into X, y pairs for train and test sets
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=13)
@@ -142,8 +142,8 @@ def retrain():
 
         if action == 'evaluate':
             try:
-                current_metrics = utils.load_evaluation_results()   # Loads current metrics
-                new_metrics = utils.test_evaluation(model, X_train, y_train, X_test, y_test)   # Calculates updated dataset evaluation metrics
+                current_metrics = u.load_evaluation_results()   # Loads current metrics
+                new_metrics = u.test_evaluation(model, X_train, y_train, X_test, y_test)   # Calculates updated dataset evaluation metrics
             
                 # Returns both sets of metrics to frontend for user evaluation and decision
                 return jsonify({
@@ -171,7 +171,7 @@ def retrain():
                 # Save the retrained model
                 pkl.dump(updated_model, open('./models/model.pkl', 'wb'))
 
-                utils.save_evaluation_results(new_metrics) 
+                u.save_evaluation_results(new_metrics) 
 
                 return jsonify({'Message': 'Updated dataset and model saved successfully'}), 200
 
