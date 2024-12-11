@@ -140,11 +140,11 @@ def retrain():
         # Use a parameter to select what to action to take
         action = request.args.get('action', 'evaluate')
 
+        current_metrics = u.load_evaluation_results()   # Loads current metrics
+        new_metrics = u.test_evaluation(model, X_train, y_train, X_test, y_test)   # Calculates updated dataset evaluation metrics
+            
         if action == 'evaluate':
             try:
-                current_metrics = u.load_evaluation_results()   # Loads current metrics
-                new_metrics = u.test_evaluation(model, X_train, y_train, X_test, y_test)   # Calculates updated dataset evaluation metrics
-            
                 # Returns both sets of metrics to frontend for user evaluation and decision
                 return jsonify({
                     'Message': 'Evaluation Complete. Metrics comparison ready',
