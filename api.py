@@ -88,6 +88,8 @@ def retrain():
     model = pkl.load(open('./models/model.pkl', 'rb'))
 
     try:
+        print('Request files:', request.files)
+        print('request content type:', request.content_type)
         # Checks if the request actually contains a file (aiming to send a csv file)
         if 'file' not in request.files:
             return jsonify({'Error': 'No file uploaded'}), 400
